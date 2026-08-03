@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="GestionCommerciale.Api/GestionCommerciale.Api.csproj" />
+  <Project Path="GestionCommerciale.Domain/GestionCommerciale.Domain.csproj" />
+  <Project Path="GestionCommerciale.Infrastructure/GestionCommerciale.Infrastructure.csproj" />
+  <Project Path="GestionCommerciale.Tests/GestionCommerciale.Tests.csproj" />
+</Solution>
