@@ -1,14 +1,16 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace GestionCommerciale.Domain
 {
     /// <summary>
-    /// Client
+    /// Client — une entité du Domain.
+    /// C'est un record : deux Client avec les mêmes valeurs (Id, Name, Email) sont considérés égaux,
+    /// et une fois construit, ses propriétés positionnelles (Id, Name, Email) ne peuvent plus changer.
     /// </summary>
-    /// <param name="Id">Client id</param>
-    /// <param name="Name">Name</param>
-    /// <param name="Email">Email</param>
+    /// <param name="Id">Identifiant unique du client (généré côté serveur).</param>
+    /// <param name="Name">Nom du client.</param>
+    /// <param name="Email">Value object Email(voir Email.cs).</param>
     public record Client(Guid Id, string Name, Email Email);
 }

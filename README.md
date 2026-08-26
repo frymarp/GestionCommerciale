@@ -13,7 +13,14 @@ Le but était de découvrir les dernières features .NET 10, tout en travaillant
 
 ## Statut
 
-Projet en cours de construction, mise en place de l'environnement et de la structure de solution.
+Projet en cours de construction.
+
+- Domaine métier modélisé (Client, Product, Order, OrderLine, StatusOrder + transitions de statut).
+- API : injection de dépendances, Options pattern (base de données, JWT, facturation), validation des
+  requêtes via FluentValidation + un filtre d'endpoint générique.
+- Repositories en mémoire en place (IClientRepository, IProductRepository, IOrderRepository), en
+  attendant une vraie base de données.
+- À venir : endpoints HTTP, persistance EF Core, historique des factures, interface Blazor.
 
 ## Structure de la solution
 

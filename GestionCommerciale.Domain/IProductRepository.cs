@@ -1,0 +1,31 @@
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace GestionCommerciale.Domain
+{
+    /// <summary>
+    /// Contrat du repository Product : le Domain décrit ce qui doit être possible (lister, obtenir,
+    /// ajouter un produit), sans jamais dire comment ce sera fait. Aucune dépendance à EF Core, à une
+    /// base de données ou à quoi que ce soit de technique.
+    /// Toutes les méthodes sont asynchrones car une implémentation persistante
+    /// fera de vrais appels réseau vers la base de données.
+    /// </summary>
+    public interface IProductRepository
+    {
+        /// <summary>Retourne tous les produits.</summary>
+        /// <returns>La liste de tous les produits existants (vide si aucun).</returns>
+        Task<List<Product>> ListAsync();
+
+        /// <summary>Retourne un produit par son Id, ou null s'il n'existe pas.</summary>
+        /// <param name="id">Identifiant du produit recherché.</param>
+        /// <returns>Le produit correspondant, ou null si aucun produit ne porte cet Id.</returns>
+        Task<Product?> GetAsync(Guid id);
+
+        /// <summary>Ajoute un nouveau produit.</summary>
+        /// <param name="product">Le produit à ajouter.</param>
+        /// <returns>Une tâche représentant l'opération asynchrone (pas de valeur de retour).</returns>
+        Task AddAsync(Product product);
+
+    }
+}
