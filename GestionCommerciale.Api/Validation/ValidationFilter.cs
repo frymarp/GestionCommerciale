@@ -5,9 +5,9 @@ namespace GestionCommerciale.Api.Validation
     /// <summary>
     /// Filtre d'endpoint générique et réutilisable : quel que soit T (CreateClientRequest,
     /// CreateOrderRequest...), il sait exécuter le bon validateur FluentValidation, à condition
-    /// qu'un IValidator&lt;T&gt; correspondant soit enregistré dans le conteneur DI (fait
+    /// qu'un IValidator<> correspondant soit enregistré dans le conteneur DI (fait
     /// automatiquement par AddValidatorsFromAssemblyContaining dans Program.cs).
-    /// Appliqué à un endpoint via .AddEndpointFilter&lt;ValidationFilter&lt;CreateClientRequest&gt;&gt;().
+    /// Appliqué à un endpoint via .AddEndpointFilter<ValidationFilter<CreateClientRequest>>().
     /// </summary>
     public class ValidationFilter<T> : IEndpointFilter
     {
@@ -29,8 +29,7 @@ namespace GestionCommerciale.Api.Validation
         /// </returns>
         public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
         {
-            // Récupère l'argument de type T passé à l'endpoint (ex. le CreateClientRequest désérialisé
-            // depuis le corps de la requête HTTP).
+            // Récupère l'argument de type T passé à l'endpoint (ex. le CreateClientRequest désérialisé depuis le corps de la requête HTTP).
             var request = context.GetArgument<T>(0);
             var result = await _validator.ValidateAsync(request);
 

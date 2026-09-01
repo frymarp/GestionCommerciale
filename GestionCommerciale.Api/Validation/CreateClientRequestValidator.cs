@@ -5,7 +5,7 @@ namespace GestionCommerciale.Api.Validation
 {
     /// <summary>
     /// Regroupe toutes les règles de validation de CreateClientRequest à un seul endroit, plutôt
-    /// que des "if" éparpillés dans l'endpoint. Exécuté automatiquement par ValidationFilter&lt;T&gt;
+    /// que des "if" éparpillés dans l'endpoint. Exécuté automatiquement par ValidationFilter<>
     /// avant que le code de l'endpoint ne s'exécute.
     /// </summary>
     public class CreateClientRequestValidator : AbstractValidator<CreateClientRequest>

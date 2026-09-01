@@ -27,5 +27,15 @@ namespace GestionCommerciale.Domain
         /// <returns>Une tâche représentant l'opération asynchrone (pas de valeur de retour).</returns>
         Task AddAsync(Product product);
 
+        /// <summary>Modifie un nouveau produit.</summary>
+        /// <param name="product">Le produit à modifier.</param>
+        /// <returns>Une tâche représentant l'opération asynchrone (pas de valeur de retour).</returns>
+        Task EditAsync(Product product);
+
+        /// <summary>Supprime un nouveau produit.</summary>
+        /// <param name="id">L'ID du produit à supprimer.</param>
+        /// <returns>Une tâche représentant l'opération asynchrone (pas de valeur de retour).</returns>
+        Task DeleteAsync(Guid id);
+
     }
 }

@@ -1,8 +1,11 @@
 using FluentValidation;
+using GestionCommerciale.Api.Endpoints;
 using GestionCommerciale.Api.Options;
 using GestionCommerciale.Api.Validation;
 using GestionCommerciale.Domain;
 using GestionCommerciale.Infrastructure;
+using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,9 +27,39 @@ builder.Services.Configure<BillingOptions>(builder.Configuration.GetSection("Bil
 //CreateClientRequestValidator sert juste de "repère" pour indiquer quel assembly scanner.
 builder.Services.AddValidatorsFromAssemblyContaining<CreateClientRequestValidator>();
 
+// Enregistre le conteneur DI qui va générer le document OpenAPI (json qui décrit les routes, params etc...)
+builder.Services.AddOpenApi();
+
+
 // builder.Build() fige la configuration ci-dessus et produit "app", l'objet représentant
 // l'application prête à recevoir des requêtes. app.Run() démarre le serveur et bloque le programme
 // à cet endroit tant que l'application tourne.
 var app = builder.Build();
 
+//Groupes d'endpoints
+app.MapClientsEndpoints();
+app.MapProductsEndpoints();
+app.MapOrdersEndpoints();
+
+//endpoint Http qui permet de récupéré le document généré open api (format json brut)
+app.MapOpenApi();
+//endpoint Html de l'interface graphique Scalar (pareil qu'au dessus mais plus simple pour les users)
+app.MapScalarApiReference();
+
+//Middleware de gestion d'erreur (recupère celles dans Orders POST quand un client est introuvable par ex)
+app.UseExceptionHandler(errorApp =>
+{
+    errorApp.Run(async context =>
+    {
+        context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+        await context.Response.WriteAsJsonAsync(new ProblemDetails
+        {
+            Title = "Une erreur inattendue est survenue",
+            Status = StatusCodes.Status500InternalServerError
+        });
+    });
+});
+
+
 app.Run();
+

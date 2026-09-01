@@ -32,7 +32,32 @@ namespace GestionCommerciale.Infrastructure
         public Task<List<Product>> ListAsync() =>
             Task.FromResult(_products.ToList());
 
+
         // Task.FromResult/Task.CompletedTask : le travail ici (lire/écrire une List<T> en mémoire) est 100% synchrone et instantané.
         // Le résultat est quand même dans une Task déjà terminée, parce que la signature de la méthode (imposée par l'interface) est asynchrone.
+
+        /// <summary>
+        /// Modifie un produit existant
+        /// </summary>
+        /// <param name="product">Le produit à modifier</param>
+        /// <returns>Une tâche déjà terminée (Task.CompletedTask). Aucun travail réellement asynchrone n'a lieu ici.</returns>
+        public Task EditAsync (Product product)
+        {
+            var index = _products.FindIndex(p =>  p.Id == product.Id);
+            if (index >= 0)
+                _products[index] = product;
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Supprimer un produit
+        /// </summary>
+        /// <param name="id">Identifiant du produit à supprimer</param>
+        /// <returns>Une tâche déjà terminée (Task.CompletedTask). Aucun travail réellement asynchrone n'a lieu ici.</returns>
+        public Task DeleteAsync(Guid id)
+        {
+            _products.RemoveAll(p =>  p.Id == id);
+            return Task.CompletedTask;
+        }
     }
 }
