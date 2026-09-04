@@ -5,7 +5,9 @@ using GestionCommerciale.Api.Validation;
 using GestionCommerciale.Domain;
 using GestionCommerciale.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi;
 using Scalar.AspNetCore;
+using System.Reflection.Metadata;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<IClientRepository, InMemoryClientRepository>();
 builder.Services.AddSingleton<IProductRepository, InMemoryProductRepository>();
 builder.Services.AddSingleton<IOrderRepository, InMemoryOrderRepository>();
+builder.Services.AddSingleton<IInvoiceRepository, InMemoryInvoiceRepository>();
 
 // Options pattern : lie chaque classe à sa section d'appsettings.json, ce qui la rend injectable
 // ailleurs via IOptions<T> (IOptions<DatabaseOptions>).
@@ -28,7 +31,22 @@ builder.Services.Configure<BillingOptions>(builder.Configuration.GetSection("Bil
 builder.Services.AddValidatorsFromAssemblyContaining<CreateClientRequestValidator>();
 
 // Enregistre le conteneur DI qui va générer le document OpenAPI (json qui décrit les routes, params etc...)
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    //Ajout des tags 
+    options.AddDocumentTransformer((document, context, cancellationToken) =>
+    {
+        document.Tags = new HashSet<OpenApiTag>
+    {
+        new() { Name = "Clients", Description = "Gestion des clients : création et consultation." },
+        new() { Name = "Products", Description = "Catalogue des produits : création, modification, suppression." },
+        new() { Name = "Orders", Description = "Création des commandes à partir d'un client et de produits existants." },
+        new() { Name = "Invoices", Description = "Consultation des factures générées, et action de paiement." },
+    };
+        return Task.CompletedTask;
+    });
+});
+
 
 
 // builder.Build() fige la configuration ci-dessus et produit "app", l'objet représentant
@@ -40,9 +58,11 @@ var app = builder.Build();
 app.MapClientsEndpoints();
 app.MapProductsEndpoints();
 app.MapOrdersEndpoints();
+app.MapInvoicesEndpoints();
 
 //endpoint Http qui permet de récupéré le document généré open api (format json brut)
 app.MapOpenApi();
+
 //endpoint Html de l'interface graphique Scalar (pareil qu'au dessus mais plus simple pour les users)
 app.MapScalarApiReference();
 

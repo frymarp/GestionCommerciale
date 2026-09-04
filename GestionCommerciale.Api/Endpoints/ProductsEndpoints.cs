@@ -1,6 +1,7 @@
 ﻿using GestionCommerciale.Api.Contracts;
 using GestionCommerciale.Api.Validation;
 using GestionCommerciale.Domain;
+using System.ComponentModel;
 
 namespace GestionCommerciale.Api.Endpoints
 {
@@ -22,13 +23,21 @@ namespace GestionCommerciale.Api.Endpoints
             // GET /products — retourne tous les produits. IClientRepository est injecté automatiquement
             // par le conteneur DI à chaque appel.
             group.MapGet("/", async (IProductRepository repo) =>
-                Results.Ok(await repo.ListAsync()));
+                Results.Ok(await repo.ListAsync()))
+                .WithSummary("Liste tous les produits.")
+                .WithDescription("Retourne la liste complète des produits enregistrés, sans filtre ni pagination.");
 
-            // GET /products/{id} — retourne un client précis.
+
+            // GET /products/{id} — retourne un produit précis.
             // si le segment d'URL n'a pas le format d'un GUID, ASP.NET Core renvoie 404 avant même
             // d'atteindre ce code.
-            group.MapGet("/{id:guid}", async (Guid id, IProductRepository repo) =>
-                await repo.GetAsync(id) is { } product ? Results.Ok(product) : Results.NotFound());
+            group.MapGet("/{id:guid}", async ([Description("Identifiant du produit à récupérer.")] Guid id, IProductRepository repo) =>
+                await repo.GetAsync(id) is { } product 
+                ? Results.Ok(product) 
+                : Results.NotFound())
+                .WithSummary("Récupère un produit par son Id.")
+                .WithDescription("Retourne 404 si aucun produit ne correspond à l'Id fourni.");
+
 
             // POST /products — crée un produit. "request" est le DTO reçu (texte brut désérialisé
             // depuis le JSON de la requête) : il est transformé ici en un vrai Produit du Domain,
@@ -45,10 +54,13 @@ namespace GestionCommerciale.Api.Endpoints
             // Fait passer "request" par CreateProductRequestValidator avant d'exécuter le code
             // ci-dessus : si les règles ne sont pas respectées, un 400 est renvoyé directement,
             // sans jamais construire de Produit ni toucher au repository.
-            .AddEndpointFilter<ValidationFilter<CreateProductRequest>>();
+            .AddEndpointFilter<ValidationFilter<CreateProductRequest>>()
+            .WithSummary("Crée un produit.")
+            .WithDescription("Valide la requête (nom, prix) avant de créer le produit ; renvoie 400 si les règles ne sont pas respectées.");
+
 
             // PUT /products - modifie un produit. "request" est le DTO reçu 
-            group.MapPut("/{id:guid}", async (Guid id, CreateProductRequest request, IProductRepository repo) =>
+            group.MapPut("/{id:guid}", async ([Description("Identifiant du produit à modifier.")] Guid id, CreateProductRequest request, IProductRepository repo) =>
             {
                 if (await repo.GetAsync(id) is null)
                     return Results.NotFound();
@@ -59,16 +71,22 @@ namespace GestionCommerciale.Api.Endpoints
             })
             // Comme pour le post, on vérifie si la modification respecte les règles
             // de validation. Sinon erreur 400.
-                .AddEndpointFilter<ValidationFilter<CreateProductRequest>>();
+            .AddEndpointFilter<ValidationFilter<CreateProductRequest>>()
+            .WithSummary("Modifie un produit existant.")
+            .WithDescription("Remplace le nom et le prix du produit correspondant à l'Id ; renvoie 404 si le produit n'existe pas.");
+
 
             // DELETE /products - supprime un produit. "request" est le DTO reçu
-            group.MapDelete("/", async (Guid id, IProductRepository repo) =>
+            group.MapDelete("/", async ([Description("Identifiant du produit à supprimer.")] Guid id, IProductRepository repo) =>
             {
                 if (await repo.GetAsync(id) is null)
                     return Results.NotFound();
                 await repo.DeleteAsync(id);
                 return Results.NoContent();
-            });
+            })
+            .WithSummary("Supprime un produit.")
+            .WithDescription("Renvoie 204 si la suppression a eu lieu, 404 si le produit n'existait déjà pas.");
+
 
         }
     }

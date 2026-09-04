@@ -1,6 +1,7 @@
 using GestionCommerciale.Api.Contracts;
 using GestionCommerciale.Api.Validation;
 using GestionCommerciale.Domain;
+using System.ComponentModel;
 
 namespace GestionCommerciale.Api.Endpoints
 {
@@ -24,14 +25,20 @@ namespace GestionCommerciale.Api.Endpoints
             // GET /clients — retourne tous les clients. IClientRepository est injecté automatiquement
             // par le conteneur DI à chaque appel.
             group.MapGet("/", async (IClientRepository repo) =>
-                Results.Ok(await repo.ListAsync()));
+                Results.Ok(await repo.ListAsync()))
+                .WithSummary("Liste tous les clients.")
+                .WithDescription("Retourne la liste complète des clients enregistrés, sans filtre ni pagination.");
+
 
             // GET /clients/{id} — retourne un client précis.
             // si le segment d'URL n'a pas le format d'un GUID, ASP.NET Core renvoie 404 avant même
             // d'atteindre ce code. "is { } client" teste que le résultat n'est pas null et, si c'est
             // le cas, capture la valeur dans la variable "client" en une seule expression.
-            group.MapGet("/{id:guid}", async (Guid id, IClientRepository repo) =>
-                await repo.GetAsync(id) is { } client ? Results.Ok(client) : Results.NotFound());
+            group.MapGet("/{id:guid}", async ([Description("Identifiant du client à récupérer.")] Guid id, IClientRepository repo) =>
+                await repo.GetAsync(id) is { } client ? Results.Ok(client) : Results.NotFound())
+                .WithSummary("Récupère un client par son Id.")
+                .WithDescription("Retourne 404 si aucun client ne correspond à l'Id fourni.");
+
 
             // POST /clients — crée un client. "request" est le DTO reçu (texte brut désérialisé
             // depuis le JSON de la requête) : il est transformé ici en un vrai Client du Domain,
@@ -48,7 +55,10 @@ namespace GestionCommerciale.Api.Endpoints
             // Fait passer "request" par CreateClientRequestValidator avant d'exécuter le code
             // ci-dessus : si les règles ne sont pas respectées, un 400 est renvoyé directement,
             // sans jamais construire de Client ni toucher au repository.
-            .AddEndpointFilter<ValidationFilter<CreateClientRequest>>();
+            .AddEndpointFilter<ValidationFilter<CreateClientRequest>>()
+            .WithSummary("Crée un client.")
+            .WithDescription("Valide la requête (nom, email) avant de créer le client ; renvoie 400 si les règles ne sont pas respectées.");
+
         }
     }
 }
