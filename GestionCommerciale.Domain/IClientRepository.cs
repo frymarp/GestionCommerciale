@@ -13,14 +13,16 @@ namespace GestionCommerciale.Domain
     /// </summary>
     public interface IClientRepository
     {
-        /// <summary>Retourne tous les clients.</summary>
+        /// <summary>Retourne tous les clients de l'organisation.</summary>
+        /// <param name="organizationId">Identifiant de l'organisation.</param>
         /// <returns>La liste de tous les clients existants (vide si aucun).</returns>
-        Task<List<Client>> ListAsync();
+        Task<List<Client>> ListAsync(Guid organizationId);
 
         /// <summary>Retourne un client par son Id, ou null s'il n'existe pas.</summary>
         /// <param name="id">Identifiant du client recherché.</param>
+        /// <param name="organizationId">Identifiant de l'organisation.</param>
         /// <returns>Le client correspondant, ou null si aucun client ne porte cet Id.</returns>
-        Task<Client?> GetAsync(Guid id);
+        Task<Client?> GetAsync(Guid id, Guid organizationId);
 
         /// <summary>Ajoute un nouveau client.</summary>
         /// <param name="client">Le client à ajouter.</param>

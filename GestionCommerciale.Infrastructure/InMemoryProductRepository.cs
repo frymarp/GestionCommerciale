@@ -23,14 +23,16 @@ namespace GestionCommerciale.Infrastructure
 
         /// <summary>Recherche un produit par son Id dans la liste en mémoire.</summary>
         /// <param name="id">Identifiant du produit recherché.</param>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>Le produit trouvé, ou null si aucun produit de la liste ne porte cet Id.</returns>
-        public Task<Product?> GetAsync(Guid id) =>
-            Task.FromResult(_products.FirstOrDefault(c => c.Id == id));
+        public Task<Product?> GetAsync(Guid id, Guid organizationId) =>
+            Task.FromResult(_products.Where(p => p.OrganizationId == organizationId).FirstOrDefault(c => c.Id == id));
 
         /// <summary>Retourne une copie de la liste de tous les produits en mémoire.</summary>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>Une nouvelle liste contenant tous les produits actuellement stockés.</returns>
-        public Task<List<Product>> ListAsync() =>
-            Task.FromResult(_products.ToList());
+        public Task<List<Product>> ListAsync(Guid organizationId) =>
+            Task.FromResult(_products.Where(p => p.OrganizationId == organizationId).ToList());
 
 
         // Task.FromResult/Task.CompletedTask : le travail ici (lire/écrire une List<T> en mémoire) est 100% synchrone et instantané.

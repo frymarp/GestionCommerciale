@@ -14,14 +14,16 @@ namespace GestionCommerciale.Infrastructure
         private readonly List<Invoice> _invoices = new();
 
         /// <summary>Retourne toutes les factures.</summary>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>La liste de toutes les factures existantes (vide si aucun).</returns>
-        public Task<List<Invoice>> ListAsync() => Task.FromResult(_invoices.ToList());
+        public Task<List<Invoice>> ListAsync(Guid organizationId) => Task.FromResult(_invoices.Where(f => f.OrganizationId == organizationId).ToList());
 
         /// <summary>Recherche un client par son Id dans la liste en mémoire.</summary>
         /// <param name="id">Identifiant du client recherché.</param>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>Le client trouvé, ou null si aucun client de la liste n'a cet Id.</returns>
-        public Task<Invoice?> GetAsync(Guid id) =>
-            Task.FromResult(_invoices.FirstOrDefault(f => f.Id == id));
+        public Task<Invoice?> GetAsync(Guid id, Guid organizationId) =>
+            Task.FromResult(_invoices.FirstOrDefault(f => f.Id == id && f.OrganizationId == organizationId));
 
         /// <summary>Ajoute une facture à la liste en mémoire.</summary>
         /// <param name="invoice">La facture à ajouter.</param>

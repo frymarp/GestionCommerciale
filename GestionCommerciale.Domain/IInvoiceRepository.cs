@@ -15,13 +15,15 @@ namespace GestionCommerciale.Domain
     public interface IInvoiceRepository
     {
         /// <summary>Retourne toutes les factures.</summary>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>La liste de toutes les factures existantes (vide si aucun).</returns>
-        Task<List<Invoice>> ListAsync();
+        Task<List<Invoice>> ListAsync(Guid organizationId);
 
         /// <summary>Retourne une facture par son Id, ou null s'il n'existe pas.</summary>
         /// <param name="id">Identifiant de la facture recherchée.</param>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>La facture correspondante, ou null si aucune facture ne porte cet Id.</returns>
-        Task<Invoice?> GetAsync(Guid id);
+        Task<Invoice?> GetAsync(Guid id, Guid organizationId);
 
         /// <summary>Ajoute une nouvelle facture.</summary>
         /// <param name="invoice">La facture à ajouter.</param>

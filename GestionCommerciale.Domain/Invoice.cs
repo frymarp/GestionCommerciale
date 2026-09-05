@@ -11,9 +11,10 @@ namespace GestionCommerciale.Domain
     /// ci-dessous), ce qui justifie qu'ils ne soient pas dans la liste positionnelle du record.
     /// </summary>
     /// <param name="Id">Identifiant unique (généré côté serveur).</param>
+    /// <param name="OrganizationId">Identifiant de l'organisation.</param>
     /// <param name="OrderId">Id de la commande</param>
-    /// <param name="date">Date de création</param>
-    public record Invoice(Guid Id, Guid OrderId, DateTime createdDate)
+    /// <param name="CreatedDate">Date de création</param>
+    public record Invoice(Guid Id, Guid OrganizationId, Guid OrderId, DateTime CreatedDate)
     {
         /// <summary>
         /// Statut de la facture (Pending,Paid, Cancelled).

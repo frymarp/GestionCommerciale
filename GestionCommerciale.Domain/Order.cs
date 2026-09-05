@@ -11,9 +11,10 @@ namespace GestionCommerciale.Domain
     /// ci-dessous), ce qui justifie qu'ils ne soient pas dans la liste positionnelle du record.
     /// </summary>
     /// <param name="Id">Identifiant unique (généré côté serveur).</param>
+    /// <param name="OrganizationId">Identifiant de l'organisation.</param>
     /// <param name="ClientId">Id du client</param>
     /// <param name="date">Date de création</param>
-    public record Order(Guid Id, Guid ClientId, DateTime date)
+    public record Order(Guid Id, Guid OrganizationId, Guid ClientId, DateTime date)
     {
         /// <summary>
         /// Statut de la commande (Draft, Approved, Invoiced, Paid, Canceled).

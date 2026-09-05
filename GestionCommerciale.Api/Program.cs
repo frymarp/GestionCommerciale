@@ -1,6 +1,7 @@
 using FluentValidation;
 using GestionCommerciale.Api.Endpoints;
 using GestionCommerciale.Api.Options;
+using GestionCommerciale.Api.Security;
 using GestionCommerciale.Api.Validation;
 using GestionCommerciale.Domain;
 using GestionCommerciale.Infrastructure;
@@ -46,6 +47,11 @@ builder.Services.AddOpenApi(options =>
         return Task.CompletedTask;
     });
 });
+
+//TEMPORAIRE: Accès à l'entete HTTP pour récupérer l'identifiant de l'organisation
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentOrganizationProvider, HeaderOrganizationProvider>();
+
 
 
 

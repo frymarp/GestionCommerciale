@@ -9,8 +9,8 @@ namespace GestionCommerciale.Domain
     /// </summary>
     /// <param name="InvoiceId">Identifiant unique du client.</param>
     /// <param name="Description">Description</param>
-    /// <param name="createdDate">Date de création</param>
-    public record InvoiceHistory(Guid InvoiceId, string Description, DateTime createdDate)
+    /// <param name="CreatedDate">Date de création</param>
+    public record InvoiceHistory(Guid InvoiceId, string Description, DateTime CreatedDate)
     {
     }
 

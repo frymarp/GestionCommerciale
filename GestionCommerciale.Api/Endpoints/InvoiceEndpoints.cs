@@ -1,4 +1,5 @@
-﻿using GestionCommerciale.Domain;
+﻿using GestionCommerciale.Api.Security;
+using GestionCommerciale.Domain;
 using System.ComponentModel;
 namespace GestionCommerciale.Api.Endpoints
 {
@@ -21,24 +22,24 @@ namespace GestionCommerciale.Api.Endpoints
 
             // GET /invoices — retourne toutes les factures. IInvoiceRepository est injecté automatiquement
             // par le conteneur DI à chaque appel.
-            group.MapGet("/", async (IInvoiceRepository repo) =>
-                Results.Ok(await repo.ListAsync()))
+            group.MapGet("/", async (IInvoiceRepository repo, ICurrentOrganizationProvider organization) =>
+                Results.Ok(await repo.ListAsync(organization.GetOrganizationId())))
                 .WithSummary("Liste toutes les factures.")
-                .WithDescription("Retourne la liste complète des factures enregistrées, sans filtre ni pagination.");
+                .WithDescription("Retourne la liste complète des factures enregistrées de l'organisation, sans filtre ni pagination.");
 
             // GET /invoices/{id} — retourne une facture précise.
-            group.MapGet("/{id:guid}", async ([Description("Identifiant de la facture à récupérer.")] Guid id, IInvoiceRepository repo) =>
-                await repo.GetAsync(id) is { } facture
+            group.MapGet("/{id:guid}", async ([Description("Identifiant de la facture à récupérer.")] Guid id, IInvoiceRepository repo, ICurrentOrganizationProvider organization) =>
+                await repo.GetAsync(id, organization.GetOrganizationId()) is { } facture
                     ? Results.Ok(facture)
                     : Results.NotFound())
                 .WithSummary("Récupère une facture par son Id.")
-                .WithDescription("Retourne 404 si aucune facture ne correspond à l'Id fourni.");
+                .WithDescription("Retourne 404 si aucune facture de l'organisation courante ne correspond à l'Id fourni.");
 
             // POST /invoices{id}/invoice — passe une commande à payée
-            group.MapPost("/{id:guid}/pay", async ([Description("Identifiant de la facture à passer à payée.")] Guid id, IInvoiceRepository repo) =>
+            group.MapPost("/{id:guid}/pay", async ([Description("Identifiant de la facture à passer à payée.")] Guid id, IInvoiceRepository repo, ICurrentOrganizationProvider organization) =>
             {
                 //Récupère la facture
-                if (await repo.GetAsync(id) is not { } invoice)
+                if (await repo.GetAsync(id,organization.GetOrganizationId()) is not { } invoice)
                     return Results.NotFound();
 
                 if (!InvoiceTransitions.CanTransitionTo(invoice.Status, InvoiceStatus.Paid))
@@ -48,7 +49,7 @@ namespace GestionCommerciale.Api.Endpoints
                 return Results.Ok(invoice);
             })
             .WithSummary("Marque une facture comme payée.")
-            .WithDescription("Fait passer la facture au statut Payée ; renvoie 409 si la transition n'est pas autorisée depuis le statut actuel.");
+            .WithDescription("Fait passer la facture au statut Payée. Renvoie 409 si la transition n'est pas autorisée depuis le statut actuel ou si la facture est introuvable.");
         }
     }
 

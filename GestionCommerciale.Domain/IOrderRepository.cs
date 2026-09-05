@@ -14,13 +14,15 @@ namespace GestionCommerciale.Domain
     public interface IOrderRepository
     {
         /// <summary>Retourne toutes les commandes.</summary>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>La liste de toutes les commandes existantes (vide si aucune).</returns>
-        Task<List<Order>> ListAsync();
+        Task<List<Order>> ListAsync(Guid organizationId);
 
         /// <summary>Retourne une commande par son Id, ou null si elle n'existe pas.</summary>
         /// <param name="id">Identifiant de la commande recherchée.</param>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>La commande correspondante, ou null si aucune commande ne porte cet Id.</returns>
-        Task<Order?> GetAsync(Guid id);
+        Task<Order?> GetAsync(Guid id, Guid organizationId);
 
         /// <summary>Ajoute une nouvelle commande.</summary>
         /// <param name="order">La commande à ajouter.</param>

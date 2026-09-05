@@ -14,13 +14,15 @@ namespace GestionCommerciale.Domain
     public interface IProductRepository
     {
         /// <summary>Retourne tous les produits.</summary>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>La liste de tous les produits existants (vide si aucun).</returns>
-        Task<List<Product>> ListAsync();
+        Task<List<Product>> ListAsync(Guid organizationId);
 
         /// <summary>Retourne un produit par son Id, ou null s'il n'existe pas.</summary>
         /// <param name="id">Identifiant du produit recherché.</param>
+        /// <param name="organizationId">Identifiant de l'organisation courante.</param>
         /// <returns>Le produit correspondant, ou null si aucun produit ne porte cet Id.</returns>
-        Task<Product?> GetAsync(Guid id);
+        Task<Product?> GetAsync(Guid id, Guid organizationId);
 
         /// <summary>Ajoute un nouveau produit.</summary>
         /// <param name="product">Le produit à ajouter.</param>

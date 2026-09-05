@@ -1,4 +1,5 @@
 using GestionCommerciale.Api.Contracts;
+using GestionCommerciale.Api.Security;
 using GestionCommerciale.Api.Validation;
 using GestionCommerciale.Domain;
 using System.ComponentModel;
@@ -24,28 +25,28 @@ namespace GestionCommerciale.Api.Endpoints
 
             // GET /clients — retourne tous les clients. IClientRepository est injecté automatiquement
             // par le conteneur DI à chaque appel.
-            group.MapGet("/", async (IClientRepository repo) =>
-                Results.Ok(await repo.ListAsync()))
+            group.MapGet("/", async (IClientRepository repo,ICurrentOrganizationProvider organization) =>
+                Results.Ok(await repo.ListAsync(organization.GetOrganizationId())))
                 .WithSummary("Liste tous les clients.")
-                .WithDescription("Retourne la liste complète des clients enregistrés, sans filtre ni pagination.");
+                .WithDescription("Retourne la liste des clients de l'organisation courante, sans filtre ni pagination.");
 
 
             // GET /clients/{id} — retourne un client précis.
             // si le segment d'URL n'a pas le format d'un GUID, ASP.NET Core renvoie 404 avant même
             // d'atteindre ce code. "is { } client" teste que le résultat n'est pas null et, si c'est
             // le cas, capture la valeur dans la variable "client" en une seule expression.
-            group.MapGet("/{id:guid}", async ([Description("Identifiant du client à récupérer.")] Guid id, IClientRepository repo) =>
-                await repo.GetAsync(id) is { } client ? Results.Ok(client) : Results.NotFound())
+            group.MapGet("/{id:guid}", async ([Description("Identifiant du client à récupérer.")] Guid id, IClientRepository repo, ICurrentOrganizationProvider organization) =>
+                await repo.GetAsync(id, organization.GetOrganizationId()) is { } client ? Results.Ok(client) : Results.NotFound())
                 .WithSummary("Récupère un client par son Id.")
-                .WithDescription("Retourne 404 si aucun client ne correspond à l'Id fourni.");
+                .WithDescription("Retourne 404 si aucun client de l'organisation ne correspond à l'Id fourni.");
 
 
             // POST /clients — crée un client. "request" est le DTO reçu (texte brut désérialisé
             // depuis le JSON de la requête) : il est transformé ici en un vrai Client du Domain,
             // avec un nouvel Id et un Email validé par son propre constructeur.
-            group.MapPost("/", async (CreateClientRequest request, IClientRepository repo) =>
+            group.MapPost("/", async (CreateClientRequest request, IClientRepository repo, ICurrentOrganizationProvider organization) =>
             {
-                var client = new Client(Guid.NewGuid(), request.Name, new Email(request.Email));
+                var client = new Client(Guid.NewGuid(), organization.GetOrganizationId(), request.Name, new Email(request.Email));
                 await repo.AddAsync(client);
 
                 // Results.Created renvoie un 201 avec, dans l'en-tête Location, l'URL où retrouver
@@ -57,7 +58,7 @@ namespace GestionCommerciale.Api.Endpoints
             // sans jamais construire de Client ni toucher au repository.
             .AddEndpointFilter<ValidationFilter<CreateClientRequest>>()
             .WithSummary("Crée un client.")
-            .WithDescription("Valide la requête (nom, email) avant de créer le client ; renvoie 400 si les règles ne sont pas respectées.");
+            .WithDescription("Valide la requête (nom, email) avant de créer le client dans l'organisation courante. Renvoie 400 si les règles ne sont pas respectées.");
 
         }
     }
